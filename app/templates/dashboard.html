@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{ title }}</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">PulseRank AI — SEO, AEO &amp; SMO Portal</div>
+    <div id="userBar" class="row">
+      <span id="userLabel" class="muted">Not signed in</span>
+      <button id="logoutBtn" class="secondary hidden" onclick="logout()">Sign Out</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <section id="authSection" class="card">
+      <h2>Account Access</h2>
+      <p class="muted">Sign in or create an account to isolate your audits, ClientBrief, monitors, and SMO campaigns.</p>
+      <div class="grid-2">
+        <div>
+          <h3>Sign In</h3>
+          <div style="display:grid; gap:8px;">
+            <input id="loginEmail" type="email" placeholder="Email" />
+            <input id="loginPassword" type="password" placeholder="Password" />
+            <button onclick="login()">Sign In</button>
+          </div>
+        </div>
+        <div>
+          <h3>Register</h3>
+          <div style="display:grid; gap:8px;">
+            <input id="regName" type="text" placeholder="Full Name" />
+            <input id="regEmail" type="email" placeholder="Email" />
+            <input id="regPassword" type="password" placeholder="Password (min 6 chars)" />
+            <input id="regGstin" type="text" placeholder="GSTIN (optional)" />
+            <button onclick="register()">Create Account</button>
+          </div>
+        </div>
+      </div>
+      <p id="authError" class="muted" style="color:#fca5a5;"></p>
+    </section>
+
+    <section id="portalSection" class="hidden">
+      <div class="grid-2">
+        <div class="card">
+          <h3>1. Single-URL SEO &amp; AEO Audit</h3>
+          <p class="muted">Analyze one URL at a time. Snapshot is saved to SQLite WAL for on-demand agent optimization.</p>
+          <div class="row">
+            <input id="auditUrlInput" type="url" placeholder="https://example.com" />
+            <button onclick="submitAudit()">Run Audit</button>
+          </div>
+          <p id="auditStatusText" class="muted"></p>
+        </div>
+
+        <div class="card">
+          <h3>2. Interactive Onboarding (ClientBrief)</h3>
+          <div id="chatBox" class="chat-box">
+            <div class="chat-msg"><strong>Guide:</strong> Share your target keywords (comma-separated) to start building your ClientBrief.</div>
+          </div>
+          <div class="row">
+            <input id="chatInput" type="text" placeholder="e.g. B2B SEO SaaS, AEO optimization" />
+            <button onclick="sendOnboarding()">Send</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="scoreSummaryCard" class="card hidden">
+        <div class="row" style="justify-content:space-between; flex-wrap:wrap;">
+          <div>
+            <h2 id="activeAuditUrl" style="margin:0;">Audit Summary</h2>
+            <p class="muted" id="activeAuditMeta" style="margin:4px 0 0;"></p>
+          </div>
+          <div class="row">
+            <div class="score-pill">Overall: <span id="overallScoreVal">-</span>/100</div>
+            <div class="score-pill">SEO: <span id="seoScoreVal">-</span></div>
+            <div class="score-pill">AEO: <span id="aeoScoreVal">-</span></div>
+            <button onclick="triggerOptimization()">Optimize Now (On-Demand)</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Collapsible Sections (Collapsed by default, expanded on click) -->
+      <details class="collapsible">
+        <summary>
+          <span>Critical Error Logs</span>
+          <span id="errorCountBadge" class="badge">0 issues</span>
+        </summary>
+        <div id="errorLogsBody" class="details-body muted">Run or select an audit to inspect error logs.</div>
+      </details>
+
+      <details class="collapsible">
+        <summary>
+          <span>On-Page &amp; AEO Schema Optimization</span>
+          <span class="badge">CrewAI / Pydantic</span>
+        </summary>
+        <div id="onpageBody" class="details-body muted">Click "Optimize Now (On-Demand)" on a completed audit.</div>
+      </details>
+
+      <details class="collapsible">
+        <summary>
+          <span>Off-Page Optimization &amp; Digital PR</span>
+          <span class="badge">Backlink &amp; Outreach Crew</span>
+        </summary>
+        <div id="offpageBody" class="details-body muted">Off-page competitor profiles and PR outreach drafts appear here after optimization.</div>
+      </details>
+
+      <details class="collapsible">
+        <summary>
+          <span>Continuous Monitors (Backlinks, Content Decay, SERP Features)</span>
+          <span class="badge">Automated Alerts</span>
+        </summary>
+        <div class="details-body">
+          <div class="row" style="margin-bottom:12px;">
+            <input id="monitorUrl" type="url" placeholder="https://example.com/pricing" />
+            <select id="monitorType" style="max-width:220px;">
+              <option value="backlink">Backlink Monitor</option>
+              <option value="content_decay">Content Decay</option>
+              <option value="serp_feature">SERP Feature (AI Overview)</option>
+            </select>
+            <button onclick="addMonitor()">Add Monitor</button>
+          </div>
+          <div id="monitorsBody" class="muted">No monitors configured yet.</div>
+        </div>
+      </details>
+
+      <details class="collapsible">
+        <summary>
+          <span>SMO &amp; Community Agents (LinkedIn, IG, FB, YT, DraftPilot, Reddit, Quora)</span>
+          <span class="badge">Cross-Platform</span>
+        </summary>
+        <div class="details-body">
+          <div class="row" style="margin-bottom:12px;">
+            <input id="smoUrl" type="url" placeholder="https://example.com/blog/aeo-guide" />
+            <input id="smoTopic" type="text" placeholder="Campaign Topic (optional)" />
+            <button onclick="launchSMO()">Launch SMO Crew</button>
+          </div>
+          <div id="smoBody" class="muted">Launch an SMO campaign to generate DraftPilot &amp; community drafts.</div>
+        </div>
+      </details>
+
+      <details class="collapsible">
+        <summary>
+          <span>Indian-Market Pricing (INR + 18% GST) &amp; Monthly ROI Report</span>
+          <span class="badge">Starter / Growth / Agency</span>
+        </summary>
+        <div class="details-body">
+          <div id="pricingGrid" class="grid-3" style="margin-bottom:14px;"></div>
+          <div id="roiBody" class="muted">Loading ROI digest...</div>
+        </div>
+      </details>
+    </section>
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
